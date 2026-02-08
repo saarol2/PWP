@@ -7,6 +7,15 @@
 
 # 1. Dependency Information
 
+Database used: SQLAlchemy with FLASK framework  
+Supported Platforms: SQLAlcehmy supports Python 3.7+ and Pypy  
+Supported Databases: SQLite, Postgresql, MySQL & MariaDB, Oracle, MS-SQL  
+Requirments for using database: DB-API 2.0 - Python Database API Specification
+
+[SQLAlchemy: Features https://www.sqlalchemy.org/features.html ]
+[Python Database API specification: https://peps.python.org/pep-0249/ ]
+
+
 # 2. Instructions
 
 
