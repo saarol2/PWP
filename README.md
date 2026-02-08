@@ -1,8 +1,8 @@
 # PWP SPRING 2026
 # Swimming baths reservation system
 # Group information
-* Oliver Saari
-* Janne Tuikka
+* Oliver Saari, oliver.saari@student.oulu.fi
+* Janne Tuikka, janne.tuikka@student.oulu.fi
 * Minna Väänänen, minna.vaananen@student.oulu.fi
 
 # 1. Dependency Information
