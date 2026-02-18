@@ -20,18 +20,16 @@
 
 ### Action points
 - The amount of tables is ok. 
-- Needs a bit fix:
-In wiki, User table variabe 'created_at' has Timestamp as type instead of DATETIME.
-Reposition has Instance folder, which is ment for local settings, can be set f.e. with .gitignore -file.
-Codes docstring -comments are unreacheable by automatic parsing, needs to be under the code line or use as a normal comment.
-ONDELETE is used, but it needs to be define in relationships. 
-
+- Needs a bit fix:  
+In wiki, User table variabe 'created_at' has Timestamp as type instead of DATETIME.  
+Reposition has Instance folder, which is ment for local settings, can be set f.e. with .gitignore -file.  
+Codes docstring -comments are unreacheable by automatic parsing, needs to be under the code line or use as a normal comment.  
+ONDELETE is used, but it needs to be defined in relationships.  
 On README-file, next time use project layout document as a model.
 
 ### Notes
-As more people will be contributing to the code, it's good practise to use Black Formatter extension, might need to adjust length of the row. 
-
-Notice behaviour on relationships.
+- As more people will be contributing to the code, it's good practise to use Black Formatter extension, might need to adjust length of the row.   
+- Notice behaviour on relationships.
 
 
 
