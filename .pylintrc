@@ -1,0 +1,24 @@
+[MESSAGES CONTROL]
+disable=too-few-public-methods
+
+[MASTER]
+ignore=venv,.venv,env,ENV,build,dist,migrations
+
+[FORMAT]
+max-line-length=100
+good-names=i,j,k,e,db,id
+
+[REPORTS]
+output-format=colorized
+
+[DESIGN]
+max-args=6
+max-locals=15
+max-returns=6
+max-branches=12
+max-statements=50
+max-parents=7
+max-attributes=10
+max-public-methods=20
+
+[TYPECHECK]
