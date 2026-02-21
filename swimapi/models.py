@@ -1,5 +1,6 @@
 """Database models for the swimapi application."""
 
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -125,7 +126,50 @@ class Timeslot(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
 
-    resource = db.relationship('Resource', backref=db.backref('timeslots', lazy=True))
+    resource = db.relationship(
+        'Resource',
+        backref=db.backref('timeslots', lazy=True, passive_deletes=True)
+        )
+
+    def serialize(self):
+        """Return a dictionary representation of the timeslot."""
+        return {
+            "slot_id": self.slot_id,
+            "resource_id": self.resource_id,
+            "start_time": self.start_time.isoformat() if self.start_time else None,
+            "end_time": self.end_time.isoformat() if self.end_time else None,
+            "reservation": self.reservations[0].serialize() if self.reservations else None,
+        }
+
+    def deserialize(self, doc):
+        """Populate the timeslot's fields from a dictionary."""
+        self.resource_id = doc["resource_id"]
+        self.start_time = datetime.fromisoformat(doc["start_time"])
+        self.end_time = datetime.fromisoformat(doc["end_time"])
+
+    @staticmethod
+    def json_schema():
+        """Return the JSON schema for validating timeslot data."""
+        schema = {
+            "type": "object",
+            "required": ["resource_id", "start_time", "end_time"]
+        }
+        props = schema["properties"] = {}
+        props["resource_id"] = {
+            "description": "ID of the associated resource",
+            "type": "integer"
+        }
+        props["start_time"] = {
+            "description": "Start time in ISO 8601 format",
+            "type": "string",
+            "format": "date-time"
+        }
+        props["end_time"] = {
+            "description": "End time in ISO 8601 format",
+            "type": "string",
+            "format": "date-time"
+        }
+        return schema
 
 class Reservation(db.Model):
     """Represents a reservation made by a user for a time slot."""
@@ -142,17 +186,63 @@ class Reservation(db.Model):
         nullable=False,
         unique=True
     )
-    status = db.Column(
-        db.Enum('pending', 'confirmed', 'cancelled', 'completed'),
-        default='pending',
-        server_default='pending',
-        nullable=False
-    )
     created_at = db.Column(
         db.DateTime,
         server_default=db.func.current_timestamp(),
         nullable=False
     )
 
-    user = db.relationship('User', backref=db.backref('reservations', lazy=True))
-    timeslot = db.relationship('Timeslot', backref=db.backref('reservations', lazy=True))
+    user = db.relationship(
+        'User',
+        backref=db.backref('reservations', lazy=True, passive_deletes=True)
+        )
+    timeslot = db.relationship(
+        'Timeslot',
+        backref=db.backref('reservations', lazy=True, passive_deletes=True)
+        )
+
+    def serialize(self):
+        """Return a dictionary representation of the reservation."""
+        return {
+            "reservation_id": self.reservation_id,
+            "user_id": self.user_id,
+            "slot_id": self.slot_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
+
+    def deserialize(self, doc):
+        """Populate the reservation's fields from a dictionary."""
+        self.user_id = doc["user_id"]
+        self.slot_id = doc["slot_id"]
+
+    @staticmethod
+    def json_schema():
+        """Return the JSON schema for validating reservation data."""
+        schema = {
+            "type": "object",
+            "required": ["user_id", "slot_id"]
+        }
+        props = schema["properties"] = {}
+        props["user_id"] = {
+            "description": "ID of the user making the reservation",
+            "type": "integer"
+        }
+        props["slot_id"] = {
+            "description": "ID of the timeslot to reserve",
+            "type": "integer"
+        }
+        return schema
+
+    @staticmethod
+    def post_schema():
+        """Return the JSON schema for POST requests."""
+        schema = {
+            "type": "object",
+            "required": ["slot_id"]
+        }
+        props = schema["properties"] = {}
+        props["slot_id"] = {
+            "description": "ID of the timeslot to reserve",
+            "type": "integer"
+        }
+        return schema

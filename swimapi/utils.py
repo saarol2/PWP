@@ -16,14 +16,20 @@ def require_auth(user):
         raise Forbidden(description="Invalid API key.")
 
 
-def require_admin():
-    """Look up the user by the API key in the request header and verify they are an admin."""
+def get_current_user():
+    """Return the User matching the API key in the request header"""
     token = request.headers.get("swimapi-api-key", "")
     if not token:
         raise Forbidden(description="Missing swimapi-api-key header.")
     user = User.query.filter_by(api_key=token).first()
     if user is None:
         raise Forbidden(description="Invalid API key.")
+    return user
+
+
+def require_admin():
+    """Look up the user by the API key in the request header and verify they are an admin."""
+    user = get_current_user()
     if user.user_type != "admin":
         raise Forbidden(description="Admin privileges required.")
     return user
