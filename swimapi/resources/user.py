@@ -88,3 +88,34 @@ class UserItem(Resource):
         db.session.delete(user)
         db.session.commit()
         return Response(status=204)
+
+
+class AdminUserCollection(Resource):
+    """Endpoint for creating admin users."""
+
+    def post(self):
+        """Create a new admin user."""
+        if not request.json:
+            raise UnsupportedMediaType
+
+        try:
+            validate(request.json, User.json_schema(), format_checker=draft7_format_checker)
+        except ValidationError as e:
+            raise BadRequest(description=str(e))
+
+        user = User(api_key=secrets.token_hex(32), user_type="admin")
+        user.deserialize(request.json)
+        user.user_type = "admin"
+
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            raise Conflict(
+                description="User with email '{}' already exists.".format(request.json["email"])
+            )
+
+        body = user.serialize()
+        body["api_key"] = user.api_key
+        return body, 201
