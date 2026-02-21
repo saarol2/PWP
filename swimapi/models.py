@@ -75,6 +75,44 @@ class Resource(db.Model):
         nullable=False
     )
 
+    def serialize(self):
+        """Return a dictionary representation of the resource."""
+        return {
+            "resource_id": self.resource_id,
+            "name": self.name,
+            "description": self.description,
+            "resource_type": self.resource_type,
+        }
+
+    def deserialize(self, doc):
+        """Populate the resource's fields from a dictionary."""
+        self.name = doc["name"]
+        self.description = doc.get("description")
+        self.resource_type = doc["resource_type"]
+
+    @staticmethod
+    def json_schema():
+        """Return the JSON schema for validating resource data."""
+        schema = {
+            "type": "object",
+            "required": ["name", "resource_type"]
+        }
+        props = schema["properties"] = {}
+        props["name"] = {
+            "description": "Name of the resource",
+            "type": "string"
+        }
+        props["description"] = {
+            "description": "Optional description of the resource",
+            "type": "string"
+        }
+        props["resource_type"] = {
+            "description": "Type of the resource",
+            "type": "string",
+            "enum": ["pool", "sauna", "gym"]
+        }
+        return schema
+
 class Timeslot(db.Model):
     """Represents a time slot associated with a bookable resource."""
 
