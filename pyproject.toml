@@ -1,0 +1,33 @@
+﻿[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swimapi"
+version = "0.1.0"
+description = "Swimming baths reservation system REST API"
+requires-python = ">=3.10"
+dependencies = [
+    "flask>=3.1",
+    "flask-restful>=0.3.10",
+    "flask-sqlalchemy>=3.1",
+    "jsonschema>=4.26",
+    "sqlalchemy>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0",
+    "pytest-cov>=7.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=swimapi --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["swimapi"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true

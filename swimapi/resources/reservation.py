@@ -19,20 +19,21 @@ class ReservationCollection(Resource):
 
     def post(self):
         """Create a new reservation."""
-        if not request.json:
+        body = request.get_json(silent=True)
+        if body is None:
             raise UnsupportedMediaType
-        
+
         # Take user from API key
         user = get_current_user()
 
         try:
-            validate(request.json, Reservation.post_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
+            validate(body, Reservation.post_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 
         reservation = Reservation()
         reservation.user_id = user.user_id
-        reservation.slot_id = request.json["slot_id"]
+        reservation.slot_id = body["slot_id"]
 
         try:
             db.session.add(reservation)

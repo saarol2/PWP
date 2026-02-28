@@ -20,16 +20,17 @@ class ResourceCollection(Resource):
         """Create a new resource. Requires admin privileges."""
         require_admin()
 
-        if not request.json:
+        body = request.get_json(silent=True)
+        if not body:
             raise UnsupportedMediaType
 
         try:
-            validate(request.json, ResourceModel.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
+            validate(body, ResourceModel.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 
         resource = ResourceModel()
-        resource.deserialize(request.json)
+        resource.deserialize(body)
 
         db.session.add(resource)
         db.session.commit()
@@ -56,15 +57,16 @@ class ResourceItem(Resource):
         require_admin()
         resource = self.find_resource_by_id(resource_id)
 
-        if not request.json:
+        body = request.get_json(silent=True)
+        if not body:
             raise UnsupportedMediaType
 
         try:
-            validate(request.json, ResourceModel.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
+            validate(body, ResourceModel.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 
-        resource.deserialize(request.json)
+        resource.deserialize(body)
 
         try:
             db.session.commit()

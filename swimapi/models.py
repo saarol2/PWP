@@ -69,7 +69,7 @@ class Resource(db.Model):
     """Represents a bookable resource such as a pool, sauna, or gym."""
 
     resource_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False , unique=True)
     description = db.Column(db.Text, nullable=True)
     resource_type = db.Column(
         db.Enum('pool', 'sauna', 'gym'),
