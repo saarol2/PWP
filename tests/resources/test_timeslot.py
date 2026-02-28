@@ -1,20 +1,23 @@
-import pytest
+"""Tests for the timeslot endpoints."""
 import json
 from datetime import datetime
-from swimapi.models import Resource
 
-from swimapi.models import db, Timeslot
+from swimapi.models import Resource, db, Timeslot
 
-class TestTimeslotCollection(object):
+
+class TestTimeslotCollection:
+    """Tests for the /api/timeslots collection endpoint."""
     RESOURCE_URL = "/api/timeslots"
 
     def test_get(self, client):
+        """GET should return 200 and a list of timeslots."""
         resp = client.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         data = json.loads(resp.data)
         assert isinstance(data, list)
-    
+
     def test_post_valid_request(self, client):
+        """POST with valid JSON and admin key should return 201 and the new timeslot."""
         with client.application.app_context():
             resource_id = Resource.query.first().resource_id
 
@@ -31,8 +34,9 @@ class TestTimeslotCollection(object):
         assert resp.status_code == 201
         data = json.loads(resp.data)
         assert data["resource_id"] == resource_id
-    
+
     def test_post_wrong_content_type(self, client):
+        """POST with a non-JSON content type should return 415."""
         valid = {
             "start_time": datetime(2024, 7, 1, 10, 0).isoformat() + "Z",
             "end_time": datetime(2024, 7, 1, 11, 0).isoformat() + "Z"
@@ -44,8 +48,9 @@ class TestTimeslotCollection(object):
             headers={"swimapi-api-key": "admin-api-key"}
         )
         assert resp.status_code == 415
-    
+
     def test_post_missing_field(self, client):
+        """POST without required fields should return 400."""
         valid = {
             "start_time": datetime(2024, 7, 1, 10, 0).isoformat() + "Z"
         }
@@ -55,9 +60,9 @@ class TestTimeslotCollection(object):
             headers={"swimapi-api-key": "admin-api-key"}
         )
         assert resp.status_code == 400
-    
+
     def test_post_conflict(self, client):
-        from swimapi.models import Resource
+        """POSTing the same timeslot twice should return 409 on the second request."""
         with client.application.app_context():
             resource_id = Resource.query.first().resource_id
 
@@ -67,12 +72,17 @@ class TestTimeslotCollection(object):
             "end_time": datetime(2024, 8, 1, 11, 0).isoformat() + "Z"
         }
         client.post(self.RESOURCE_URL, json=slot, headers={"swimapi-api-key": "admin-api-key"})
-        resp = client.post(self.RESOURCE_URL, json=slot, headers={"swimapi-api-key": "admin-api-key"})
+        resp = client.post(
+            self.RESOURCE_URL, json=slot, headers={"swimapi-api-key": "admin-api-key"}
+        )
         assert resp.status_code == 409
-    
-class TestTimeslotItem(object):
+
+
+class TestTimeslotItem:
+    """Tests for the /api/timeslots/<id> item endpoint."""
 
     def test_get_valid(self, client):
+        """GET with a valid ID should return 200 and the timeslot data."""
         with client.application.app_context():
             ts = Timeslot.query.first()
             sid = ts.slot_id
@@ -85,10 +95,12 @@ class TestTimeslotItem(object):
         assert body["resource_id"] == resource_id
 
     def test_get_missing(self, client):
+        """GET for a nonexistent ID should return 404."""
         resp = client.get("/api/timeslots/999999")
         assert resp.status_code == 404
 
     def test_put_valid(self, client):
+        """PUT with valid data and admin key should return 204 and update the timeslot."""
         with client.application.app_context():
             ts = Timeslot.query.first()
             sid = ts.slot_id
@@ -112,6 +124,7 @@ class TestTimeslotItem(object):
         assert body2["resource_id"] == resource_id
 
     def test_put_not_admin(self, client):
+        """PUT with a non-admin key should return 403."""
         with client.application.app_context():
             ts = Timeslot.query.first()
             sid = ts.slot_id
@@ -130,6 +143,7 @@ class TestTimeslotItem(object):
         assert resp.status_code == 403
 
     def test_put_wrong_mediatype(self, client):
+        """PUT with a non-JSON content type should return 415."""
         with client.application.app_context():
             sid = Timeslot.query.first().slot_id
 
@@ -142,6 +156,7 @@ class TestTimeslotItem(object):
         assert resp.status_code == 415
 
     def test_put_missing_field(self, client):
+        """PUT without required fields should return 400."""
         with client.application.app_context():
             sid = Timeslot.query.first().slot_id
 
@@ -153,10 +168,10 @@ class TestTimeslotItem(object):
         assert resp.status_code == 400
 
     def test_put_conflict(self, client):
+        """PUT using times of another slot should return 409."""
         with client.application.app_context():
             slots = Timeslot.query.limit(2).all()
             sid1 = slots[0].slot_id
-            sid2 = slots[1].slot_id
             resource_id = slots[1].resource_id
             start_time = slots[1].start_time.isoformat() + "Z"
             end_time = slots[1].end_time.isoformat() + "Z"
@@ -169,6 +184,7 @@ class TestTimeslotItem(object):
         assert resp.status_code == 409
 
     def test_delete_valid(self, client):
+        """DELETE with admin key should return 204 and make the slot unreachable."""
         with client.application.app_context():
             ts = Timeslot(
                 resource_id=Resource.query.first().resource_id,
@@ -189,6 +205,7 @@ class TestTimeslotItem(object):
         assert resp2.status_code == 404
 
     def test_delete_not_admin(self, client):
+        """DELETE with a non-admin key should return 403."""
         with client.application.app_context():
             sid = Timeslot.query.first().slot_id
 
@@ -199,6 +216,7 @@ class TestTimeslotItem(object):
         assert resp.status_code == 403
 
     def test_delete_missing(self, client):
+        """DELETE for a nonexistent ID should return 404."""
         resp = client.delete(
             "/api/timeslots/999999",
             headers={"swimapi-api-key": "admin-api-key"}

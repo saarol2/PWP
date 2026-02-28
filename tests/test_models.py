@@ -1,11 +1,13 @@
-import pytest
+"""Unit tests for swimapi model serialize/deserialize/schema methods."""
 from datetime import datetime
 from swimapi.models import User, Resource, Timeslot, Reservation
 
 
-class TestUser(object):
+class TestUser:
+    """Tests for the User model."""
 
     def test_serialize(self):
+        """serialize() should return a dict with all user fields."""
         user = User(
             user_id=1,
             name="Test User",
@@ -19,6 +21,7 @@ class TestUser(object):
         assert serialized["user_type"] == "customer"
 
     def test_deserialize(self):
+        """deserialize() should update name and email from a dict."""
         user = User()
         user.name = "old"
 
@@ -33,6 +36,7 @@ class TestUser(object):
         assert user.email == "new@test.com"
 
     def test_json_schema(self):
+        """json_schema() should require name and email as strings."""
         schema = User.json_schema()
         assert schema["type"] == "object"
         assert "required" in schema
@@ -44,9 +48,11 @@ class TestUser(object):
         assert props["email"]["type"] == "string"
 
 
-class TestResource(object):
+class TestResource:
+    """Tests for the Resource model."""
 
     def test_serialize(self):
+        """serialize() should return a dict with all resource fields."""
         resource = Resource(
             resource_id=1,
             name="Test Pool",
@@ -60,6 +66,7 @@ class TestResource(object):
         assert serialized["resource_type"] == "pool"
 
     def test_deserialize(self):
+        """deserialize() should update name, description and resource_type."""
         resource = Resource()
         resource.name = "old"
 
@@ -76,6 +83,7 @@ class TestResource(object):
         assert resource.resource_type == "sauna"
 
     def test_json_schema(self):
+        """json_schema() should require name and resource_type as strings."""
         schema = Resource.json_schema()
         assert schema["type"] == "object"
         assert "required" in schema
@@ -88,9 +96,11 @@ class TestResource(object):
         assert props["resource_type"]["type"] == "string"
 
 
-class TestTimeslot(object):
+class TestTimeslot:
+    """Tests for the Timeslot model."""
 
     def test_serialize(self):
+        """serialize() should return ISO-format datetime strings."""
         timeslot = Timeslot(
             slot_id=1,
             resource_id=2,
@@ -104,6 +114,7 @@ class TestTimeslot(object):
         assert serialized["end_time"] == "2024-01-01T09:30:00"
 
     def test_deserialize(self):
+        """deserialize() should parse ISO strings into datetime objects."""
         timeslot = Timeslot()
         timeslot.start_time = None
 
@@ -120,6 +131,7 @@ class TestTimeslot(object):
         assert timeslot.end_time == datetime(2024, 1, 1, 9, 30, 0)
 
     def test_json_schema(self):
+        """json_schema() should require resource_id, start_time and end_time."""
         schema = Timeslot.json_schema()
         assert schema["type"] == "object"
         assert "required" in schema
@@ -133,9 +145,11 @@ class TestTimeslot(object):
         assert props["end_time"]["type"] == "string"
 
 
-class TestReservation(object):
+class TestReservation:
+    """Tests for the Reservation model."""
 
     def test_serialize(self):
+        """serialize() should return a dict with reservation_id, user_id and slot_id."""
         reservation = Reservation(
             reservation_id=1,
             user_id=2,
@@ -147,6 +161,7 @@ class TestReservation(object):
         assert serialized["slot_id"] == 3
 
     def test_deserialize(self):
+        """deserialize() should update user_id and slot_id from a dict."""
         reservation = Reservation()
         reservation.reservation_id = 1
 
@@ -161,6 +176,7 @@ class TestReservation(object):
         assert reservation.slot_id == 3
 
     def test_json_schema(self):
+        """json_schema() should require user_id and slot_id as integers."""
         schema = Reservation.json_schema()
         assert schema["type"] == "object"
         assert "required" in schema
@@ -172,6 +188,7 @@ class TestReservation(object):
         assert props["slot_id"]["type"] == "integer"
 
     def test_post_schema(self):
+        """post_schema() should require slot_id but not user_id."""
         schema = Reservation.post_schema()
         assert schema["type"] == "object"
         assert "required" in schema

@@ -5,8 +5,8 @@ from jsonschema import validate, ValidationError, Draft7Validator
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import Conflict, BadRequest, UnsupportedMediaType, NotFound
 
-from ..models import db, Resource as ResourceModel
-from ..utils import require_admin
+from ..models import db, Resource as ResourceModel  # pylint: disable=relative-beyond-top-level
+from ..utils import require_admin  # pylint: disable=relative-beyond-top-level
 
 
 class ResourceCollection(Resource):
@@ -25,9 +25,12 @@ class ResourceCollection(Resource):
             raise UnsupportedMediaType
 
         try:
-            validate(body, ResourceModel.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
+            validate(
+                body, ResourceModel.json_schema(),
+                format_checker=Draft7Validator.FORMAT_CHECKER
+            )
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         resource = ResourceModel()
         resource.deserialize(body)
@@ -62,17 +65,20 @@ class ResourceItem(Resource):
             raise UnsupportedMediaType
 
         try:
-            validate(body, ResourceModel.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
+            validate(
+                body, ResourceModel.json_schema(),
+                format_checker=Draft7Validator.FORMAT_CHECKER
+            )
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         resource.deserialize(body)
 
         try:
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             db.session.rollback()
-            raise Conflict(description="A resource with these details already exists.")
+            raise Conflict(description="A resource with these details already exists.") from exc
 
         return Response(status=204)
 

@@ -1,3 +1,4 @@
+"""User endpoints for managing user accounts."""
 import secrets
 from flask import Response, request
 from flask_restful import Resource
@@ -5,8 +6,8 @@ from jsonschema import validate, ValidationError, Draft7Validator
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import Conflict, BadRequest, UnsupportedMediaType, NotFound
 
-from ..models import db, User
-from ..utils import require_auth
+from ..models import db, User  # pylint: disable=relative-beyond-top-level
+from ..utils import require_auth  # pylint: disable=relative-beyond-top-level
 
 
 class UserCollection(Resource):
@@ -25,7 +26,7 @@ class UserCollection(Resource):
         try:
             validate(body, User.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         user = User(api_key=secrets.token_hex(32))
         user.deserialize(body)
@@ -33,11 +34,11 @@ class UserCollection(Resource):
         try:
             db.session.add(user)
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             db.session.rollback()
             raise Conflict(
-                description="User with email '{}' already exists.".format(body["email"])
-            )
+                description=f"User with email '{body['email']}' already exists."
+            ) from exc
 
         body = user.serialize()
         body["api_key"] = user.api_key
@@ -48,6 +49,7 @@ class UserItem(Resource):
     """Operations on a single user."""
 
     def find_user_by_id(self, user_id):
+        """Return the user with the given ID or raise 404."""
         user = User.query.get(user_id)
         if user is None:
             raise NotFound(description=f"User {user_id} not found.")
@@ -69,17 +71,17 @@ class UserItem(Resource):
         try:
             validate(body, User.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         user.deserialize(body)
 
         try:
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             db.session.rollback()
             raise Conflict(
-                description="User with email '{}' already exists.".format(body["email"])
-            )
+                description=f"User with email '{body['email']}' already exists."
+            ) from exc
 
         return Response(status=204)
 
@@ -104,7 +106,7 @@ class AdminUserCollection(Resource):
         try:
             validate(body, User.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         user = User(api_key=secrets.token_hex(32), user_type="admin")
         user.deserialize(body)
@@ -113,11 +115,11 @@ class AdminUserCollection(Resource):
         try:
             db.session.add(user)
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             db.session.rollback()
             raise Conflict(
-                description="User with email '{}' already exists.".format(body["email"])
-            )
+                description=f"User with email '{body['email']}' already exists."
+            ) from exc
 
         body = user.serialize()
         body["api_key"] = user.api_key

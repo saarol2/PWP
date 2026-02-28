@@ -5,8 +5,8 @@ from jsonschema import validate, ValidationError, Draft7Validator
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Conflict, NotFound, UnsupportedMediaType
 
-from ..models import db, Timeslot
-from ..utils import require_admin
+from ..models import db, Timeslot  # pylint: disable=relative-beyond-top-level
+from ..utils import require_admin  # pylint: disable=relative-beyond-top-level
 
 
 class TimeslotCollection(Resource):
@@ -27,7 +27,7 @@ class TimeslotCollection(Resource):
         try:
             validate(body, Timeslot.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         timeslot = Timeslot()
         timeslot.deserialize(body)
@@ -35,9 +35,9 @@ class TimeslotCollection(Resource):
         try:
             db.session.add(timeslot)
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             db.session.rollback()
-            raise Conflict(description="Failed to create timeslot due to a conflict.")
+            raise Conflict(description="Failed to create timeslot due to a conflict.") from exc
 
         return timeslot.serialize(), 201
 
@@ -68,15 +68,15 @@ class TimeslotItem(Resource):
         try:
             validate(body, Timeslot.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         timeslot.deserialize(body)
 
         try:
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             db.session.rollback()
-            raise Conflict(description="Failed to update timeslot due to a conflict.")
+            raise Conflict(description="Failed to update timeslot due to a conflict.") from exc
 
         return Response(status=204)
 

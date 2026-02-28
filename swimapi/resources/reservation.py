@@ -5,8 +5,8 @@ from jsonschema import validate, ValidationError, Draft7Validator
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Conflict, NotFound, UnsupportedMediaType
 
-from ..models import db, Reservation
-from ..utils import require_auth, require_admin, get_current_user
+from ..models import db, Reservation  # pylint: disable=relative-beyond-top-level
+from ..utils import require_auth, require_admin, get_current_user  # pylint: disable=relative-beyond-top-level
 
 
 class ReservationCollection(Resource):
@@ -29,7 +29,7 @@ class ReservationCollection(Resource):
         try:
             validate(body, Reservation.post_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         reservation = Reservation()
         reservation.user_id = user.user_id
@@ -38,9 +38,9 @@ class ReservationCollection(Resource):
         try:
             db.session.add(reservation)
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             db.session.rollback()
-            raise Conflict(description="This timeslot is already reserved.")
+            raise Conflict(description="This timeslot is already reserved.") from exc
 
         return reservation.serialize(), 201
 
