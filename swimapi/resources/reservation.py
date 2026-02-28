@@ -1,7 +1,7 @@
 """Reservation endpoints for managing user reservations on timeslots."""
 from flask import Response, request
 from flask_restful import Resource
-from jsonschema import validate, ValidationError, draft7_format_checker
+from jsonschema import validate, ValidationError, Draft7Validator
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Conflict, NotFound, UnsupportedMediaType
 
@@ -26,7 +26,7 @@ class ReservationCollection(Resource):
         user = get_current_user()
 
         try:
-            validate(request.json, Reservation.post_schema(), format_checker=draft7_format_checker)
+            validate(request.json, Reservation.post_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 

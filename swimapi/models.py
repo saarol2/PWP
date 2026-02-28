@@ -126,6 +126,10 @@ class Timeslot(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
 
+    __table_args__ = (
+        db.UniqueConstraint('resource_id', 'start_time', name='uq_timeslot_resource_start'),
+    )
+
     resource = db.relationship(
         'Resource',
         backref=db.backref('timeslots', lazy=True, passive_deletes=True)

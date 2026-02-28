@@ -1,7 +1,7 @@
 """Resource endpoints for managing bookable resources (pools, saunas, gyms)."""
 from flask import Response, request
 from flask_restful import Resource
-from jsonschema import validate, ValidationError, draft7_format_checker
+from jsonschema import validate, ValidationError, Draft7Validator
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import Conflict, BadRequest, UnsupportedMediaType, NotFound
 
@@ -24,7 +24,7 @@ class ResourceCollection(Resource):
             raise UnsupportedMediaType
 
         try:
-            validate(request.json, ResourceModel.json_schema(), format_checker=draft7_format_checker)
+            validate(request.json, ResourceModel.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 
@@ -60,7 +60,7 @@ class ResourceItem(Resource):
             raise UnsupportedMediaType
 
         try:
-            validate(request.json, ResourceModel.json_schema(), format_checker=draft7_format_checker)
+            validate(request.json, ResourceModel.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 

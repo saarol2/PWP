@@ -1,7 +1,7 @@
 """Timeslot endpoints for managing time slots on bookable resources."""
 from flask import Response, request
 from flask_restful import Resource
-from jsonschema import validate, ValidationError, draft7_format_checker
+from jsonschema import validate, ValidationError, Draft7Validator
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Conflict, NotFound, UnsupportedMediaType
 
@@ -20,16 +20,17 @@ class TimeslotCollection(Resource):
         """Create a new timeslot. Requires admin privileges."""
         require_admin()
 
-        if not request.json:
+        body = request.get_json(silent=True)
+        if not body:
             raise UnsupportedMediaType
 
         try:
-            validate(request.json, Timeslot.json_schema(), format_checker=draft7_format_checker)
+            validate(body, Timeslot.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 
         timeslot = Timeslot()
-        timeslot.deserialize(request.json)
+        timeslot.deserialize(body)
 
         try:
             db.session.add(timeslot)
@@ -60,15 +61,16 @@ class TimeslotItem(Resource):
         require_admin()
         timeslot = self.find_timeslot_by_id(slot_id)
 
-        if not request.json:
+        body = request.get_json(silent=True)
+        if not body:
             raise UnsupportedMediaType
 
         try:
-            validate(request.json, Timeslot.json_schema(), format_checker=draft7_format_checker)
+            validate(body, Timeslot.json_schema(), format_checker=Draft7Validator.FORMAT_CHECKER)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 
-        timeslot.deserialize(request.json)
+        timeslot.deserialize(body)
 
         try:
             db.session.commit()
