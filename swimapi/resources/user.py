@@ -18,16 +18,17 @@ class UserCollection(Resource):
 
     def post(self):
         """Create a new user and return it with api_key."""
-        if not request.json:
+        body = request.get_json(silent=True)
+        if not body:
             raise UnsupportedMediaType
 
         try:
-            validate(request.json, User.json_schema(), format_checker=draft7_format_checker)
+            validate(body, User.json_schema(), format_checker=draft7_format_checker)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 
         user = User(api_key=secrets.token_hex(32))
-        user.deserialize(request.json)
+        user.deserialize(body)
 
         try:
             db.session.add(user)
@@ -35,7 +36,7 @@ class UserCollection(Resource):
         except IntegrityError:
             db.session.rollback()
             raise Conflict(
-                description="User with email '{}' already exists.".format(request.json["email"])
+                description="User with email '{}' already exists.".format(body["email"])
             )
 
         body = user.serialize()
@@ -61,22 +62,23 @@ class UserItem(Resource):
         user = self.find_user_by_id(user_id)
         require_auth(user)
 
-        if not request.json:
+        body = request.get_json(silent=True)
+        if not body:
             raise UnsupportedMediaType
 
         try:
-            validate(request.json, User.json_schema(), format_checker=draft7_format_checker)
+            validate(body, User.json_schema(), format_checker=draft7_format_checker)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 
-        user.deserialize(request.json)
+        user.deserialize(body)
 
         try:
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
             raise Conflict(
-                description="User with email '{}' already exists.".format(request.json["email"])
+                description="User with email '{}' already exists.".format(body["email"])
             )
 
         return Response(status=204)
@@ -95,16 +97,17 @@ class AdminUserCollection(Resource):
 
     def post(self):
         """Create a new admin user."""
-        if not request.json:
+        body = request.get_json(silent=True)
+        if not body:
             raise UnsupportedMediaType
 
         try:
-            validate(request.json, User.json_schema(), format_checker=draft7_format_checker)
+            validate(body, User.json_schema(), format_checker=draft7_format_checker)
         except ValidationError as e:
             raise BadRequest(description=str(e))
 
         user = User(api_key=secrets.token_hex(32), user_type="admin")
-        user.deserialize(request.json)
+        user.deserialize(body)
         user.user_type = "admin"
 
         try:
@@ -113,7 +116,7 @@ class AdminUserCollection(Resource):
         except IntegrityError:
             db.session.rollback()
             raise Conflict(
-                description="User with email '{}' already exists.".format(request.json["email"])
+                description="User with email '{}' already exists.".format(body["email"])
             )
 
         body = user.serialize()
