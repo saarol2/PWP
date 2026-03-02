@@ -2,10 +2,26 @@
 import json
 
 from swimapi.models import db, Resource
-
+from swimapi.resources.resources import resource_collection_key, resource_cache_key
+from flask import request as flask_request
 
 def _get_resource_json(name="Test Pool", resource_type="pool"):
     return {"name": name, "description": "A test resource", "resource_type": resource_type}
+
+
+class TestCacheKeyFunctions:
+    """Unit tests for cache key generator functions."""
+
+    def test_resource_collection_key(self, client):
+        """resource_collection_key should always return 'resource_collection'."""
+        with client.application.test_request_context("/api/resources"):
+            assert resource_collection_key() == "resource_collection"
+
+    def test_resource_cache_key(self, client):
+        """resource_cache_key should return 'resource_<id>' based on view_args."""
+        with client.application.test_request_context("/api/resources/42"):
+            flask_request.view_args = {"resource_id": 42}
+            assert resource_cache_key() == "resource_42"
 
 
 class TestResourceCollection:

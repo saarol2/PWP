@@ -7,11 +7,22 @@ from werkzeug.exceptions import Conflict, BadRequest, UnsupportedMediaType, NotF
 
 from ..models import db, Resource as ResourceModel  # pylint: disable=relative-beyond-top-level
 from ..utils import require_admin  # pylint: disable=relative-beyond-top-level
+from ..extensions import cache  # pylint: disable=relative-beyond-top-level
+
+def resource_collection_key():
+    """Generate cache key for the resource collection."""
+    return "resource_collection"
+
+def resource_cache_key():
+    """Generate cache key for a specific resource."""
+    resource_id = request.view_args.get('resource_id')
+    return f"resource_{resource_id}"
 
 
 class ResourceCollection(Resource):
     """Operations on the collection of bookable resources."""
 
+    @cache.cached(timeout=60, make_cache_key=resource_collection_key)
     def get(self):
         """Return a list of all resources."""
         return [r.serialize() for r in ResourceModel.query.all()]
@@ -37,6 +48,7 @@ class ResourceCollection(Resource):
 
         db.session.add(resource)
         db.session.commit()
+        cache.delete("resource_collection")
 
         return resource.serialize(), 201
 
@@ -51,6 +63,7 @@ class ResourceItem(Resource):
             raise NotFound(description=f"Resource {resource_id} not found.")
         return resource
 
+    @cache.cached(timeout=60, make_cache_key=resource_cache_key)
     def get(self, resource_id):
         """Return a single resource by ID."""
         return self.find_resource_by_id(resource_id).serialize()
@@ -80,6 +93,8 @@ class ResourceItem(Resource):
             db.session.rollback()
             raise Conflict(description="A resource with these details already exists.") from exc
 
+        cache.delete(f"resource_{resource_id}")
+        cache.delete("resource_collection")
         return Response(status=204)
 
     def delete(self, resource_id):
@@ -88,4 +103,6 @@ class ResourceItem(Resource):
         resource = self.find_resource_by_id(resource_id)
         db.session.delete(resource)
         db.session.commit()
+        cache.delete(f"resource_{resource_id}")
+        cache.delete("resource_collection")
         return Response(status=204)

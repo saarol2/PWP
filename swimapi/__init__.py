@@ -4,6 +4,7 @@ from flask import Flask
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from .models import db
+from .extensions import cache
 from .api import init_api
 
 
@@ -22,6 +23,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    cache.init_app(app, config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 60})
 
     init_api(app)
 
