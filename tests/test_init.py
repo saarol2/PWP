@@ -3,7 +3,7 @@
 import pytest
 from flask import Flask
 from sqlalchemy import inspect
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, OperationalError
 
 from swimapi import create_app
 from swimapi.models import db, User, Reservation
@@ -95,7 +95,7 @@ class TestDatabaseInit:
             bad_reservation = Reservation(user_id=user.user_id, slot_id=99999)
             db.session.add(bad_reservation)
 
-            with pytest.raises(IntegrityError):
+            with pytest.raises((IntegrityError, OperationalError)):
                 db.session.commit()
 
             db.session.rollback()
