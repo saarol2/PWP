@@ -7,12 +7,12 @@
 
 # 1. Dependency Information
 
-**Database:** SQLite  
-**ORM:** SQLAlchemy  
-**Web framework:** Flask
-**REST layer** Flask-RESTful
-**Caching**  Flask-Caching
-**Schema validation**  jsonschema
+- **Database:** SQLite  
+- **ORM:** SQLAlchemy  
+- **Web framework:** Flask
+- **REST layer** Flask-RESTful
+- **Caching**  Flask-Caching
+- **Schema validation**  jsonschema
 
 Supported Platforms: SQLAlchemy supports Python 3.7+ and Pypy  
 Supported Databases: SQLite, Postgresql, MySQL & MariaDB, Oracle, MS-SQL  
