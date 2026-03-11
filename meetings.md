@@ -34,12 +34,16 @@ On README-file, next time use project layout document as a model.
 
 
 ## Meeting 3.
-* **DATE:**
-* **PARTICIPANTS:**
-* **TEACHER:**
+* **DATE: 10.3.**
+* **PARTICIPANTS: Oliver Saari, Janne Tuikka, Minna Väänänen**
+* **TEACHER: Iván Sánchez**
 
 ### Action points
-*List here the actions points discussed with assistants*
+- API is not statelessness as it shows different things when logged in as different person.
+- Connectness, check the example (II) in lecture notes
+- 
+- Justify caches better.
+
 
 ### Notes
 *Add here notes that you consider important. This is not mandatory*
