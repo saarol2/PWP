@@ -32,7 +32,7 @@ class User(db.Model):
             "name": self.name,
             "email": self.email,
             "user_type": self.user_type,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "created_at": to_utc_z(self.created_at),
         }
 
     def deserialize(self, doc):
@@ -140,8 +140,8 @@ class Timeslot(db.Model):
         return {
             "slot_id": self.slot_id,
             "resource_id": self.resource_id,
-            "start_time": self.start_time.isoformat() if self.start_time else None,
-            "end_time": self.end_time.isoformat() if self.end_time else None,
+            "start_time": to_utc_z(self.start_time),
+            "end_time": to_utc_z(self.end_time),
             "reservation": self.reservations[0].serialize() if self.reservations else None,
         }
 
@@ -211,7 +211,7 @@ class Reservation(db.Model):
             "reservation_id": self.reservation_id,
             "user_id": self.user_id,
             "slot_id": self.slot_id,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "created_at": to_utc_z(self.created_at),
         }
 
     def deserialize(self, doc):
@@ -250,3 +250,10 @@ class Reservation(db.Model):
             "type": "integer"
         }
         return schema
+
+def to_utc_z(dt):
+    """Format naive/UTC datetime as ISO 8601 string with Z-suffix."""
+    if not dt:
+        return None
+    s = dt.replace(tzinfo=None).isoformat(timespec="seconds")
+    return s + "Z"

@@ -1,6 +1,7 @@
 """Timeslot endpoints for managing time slots on bookable resources."""
 from flask import Response, request
 from flask_restful import Resource
+from flasgger import swag_from
 from jsonschema import validate, ValidationError, Draft7Validator
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Conflict, NotFound, UnsupportedMediaType
@@ -12,10 +13,12 @@ from ..utils import require_admin  # pylint: disable=relative-beyond-top-level
 class TimeslotCollection(Resource):
     """Operations on the collection of timeslots."""
 
+    @swag_from("../doc/timeslotCollection/get.yml")
     def get(self):
         """Return a list of all timeslots."""
         return [t.serialize() for t in Timeslot.query.all()]
 
+    @swag_from("../doc/timeslotCollection/post.yml")
     def post(self):
         """Create a new timeslot. Requires admin privileges."""
         require_admin()
@@ -52,10 +55,12 @@ class TimeslotItem(Resource):
             raise NotFound(description=f"Timeslot {slot_id} not found.")
         return timeslot
 
+    @swag_from("../doc/timeslotItem/get.yml")
     def get(self, slot_id):
         """Return a single timeslot by ID."""
         return self.find_timeslot_by_id(slot_id).serialize()
 
+    @swag_from("../doc/timeslotItem/put.yml")
     def put(self, slot_id):
         """Replace an existing timeslot's data. Requires admin privileges."""
         require_admin()
@@ -80,6 +85,7 @@ class TimeslotItem(Resource):
 
         return Response(status=204)
 
+    @swag_from("../doc/timeslotItem/delete.yml")
     def delete(self, slot_id):
         """Delete a timeslot by ID. Requires admin privileges."""
         require_admin()

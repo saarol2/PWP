@@ -1,6 +1,7 @@
 """Resource endpoints for managing bookable resources (pools, saunas, gyms)."""
 from flask import Response, request
 from flask_restful import Resource
+from flasgger import swag_from
 from jsonschema import validate, ValidationError, Draft7Validator
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import Conflict, BadRequest, UnsupportedMediaType, NotFound
@@ -23,10 +24,12 @@ class ResourceCollection(Resource):
     """Operations on the collection of bookable resources."""
 
     @cache.cached(timeout=60, make_cache_key=resource_collection_key)
+    @swag_from("../doc/resourceCollection/get.yml")
     def get(self):
         """Return a list of all resources."""
         return [r.serialize() for r in ResourceModel.query.all()]
 
+    @swag_from("../doc/resourceCollection/post.yml")
     def post(self):
         """Create a new resource. Requires admin privileges."""
         require_admin()
@@ -46,10 +49,14 @@ class ResourceCollection(Resource):
         resource = ResourceModel()
         resource.deserialize(body)
 
-        db.session.add(resource)
-        db.session.commit()
-        cache.delete("resource_collection")
+        try:
+            db.session.add(resource)
+            db.session.commit()
+        except IntegrityError as exc:
+            db.session.rollback()
+            raise Conflict(description=f"Resource with name '{resource.name}' already exists.") from exc
 
+        cache.delete("resource_collection")
         return resource.serialize(), 201
 
 
@@ -64,10 +71,12 @@ class ResourceItem(Resource):
         return resource
 
     @cache.cached(timeout=60, make_cache_key=resource_cache_key)
+    @swag_from("../doc/resourceItem/get.yml")
     def get(self, resource_id):
         """Return a single resource by ID."""
         return self.find_resource_by_id(resource_id).serialize()
 
+    @swag_from("../doc/resourceItem/put.yml")
     def put(self, resource_id):
         """Replace an existing resource's data. Requires admin privileges."""
         require_admin()
@@ -97,6 +106,7 @@ class ResourceItem(Resource):
         cache.delete("resource_collection")
         return Response(status=204)
 
+    @swag_from("../doc/resourceItem/delete.yml")
     def delete(self, resource_id):
         """Delete a resource by ID. Requires admin privileges."""
         require_admin()

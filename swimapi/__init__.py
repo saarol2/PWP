@@ -3,6 +3,8 @@
 from flask import Flask
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+from flasgger import Swagger
+
 from .models import db
 from .extensions import cache
 from .api import init_api
@@ -21,6 +23,13 @@ def create_app():
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SWAGGER"] = {
+    "title": "SwimAPI",
+    "openapi": "3.0.4",
+    "uiversion": 3,
+    "doc_dir": "./doc"
+    }
+    swagger = Swagger(app, template_file="doc/base.yml")
 
     db.init_app(app)
     cache.init_app(app, config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 60})
