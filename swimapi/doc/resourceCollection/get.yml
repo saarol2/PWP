@@ -1,0 +1,17 @@
+---
+description: List all resources.
+responses:
+  '200':
+    description: Resources returned successfully.
+    content:
+      application/json:
+        example:
+        - resource_id: 1
+          name: Main Pool
+          description: Olympic size swimming pool
+          resource_type: pool
+        - resource_id: 2
+          name: North Sauna
+          description: null
+          resource_type: sauna
+

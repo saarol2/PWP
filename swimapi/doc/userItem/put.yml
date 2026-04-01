@@ -1,0 +1,31 @@
+---
+description: Replace an existing user's data.
+security:
+- swimapiApiKey: []
+parameters:
+- $ref: '#/components/parameters/user_id'
+requestBody:
+  required: true
+  description: Full replacement data for the user.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/User'
+      example:
+        name: Jane A. Doe
+        email: jane@example.com
+        user_type: customer
+responses:
+  '204':
+    description: User updated successfully.
+  '400':
+    description: The request body was not valid.
+  '403':
+    description: Missing, invalid, or unauthorized API key.
+  '404':
+    description: The user was not found.
+  '409':
+    description: A user with the same email already exists.
+  '415':
+    description: Wrong media type was used.
+

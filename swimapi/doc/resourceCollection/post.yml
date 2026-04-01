@@ -1,0 +1,35 @@
+---
+description: Create a new resource.
+security:
+- swimapiApiKey: []
+requestBody:
+  required: true
+  description: New resource data.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/Resource'
+      example:
+        name: Main Pool
+        description: Olympic size swimming pool
+        resource_type: pool
+responses:
+  '201':
+    description: Resource created successfully.
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/Resource'
+        example:
+          resource_id: 1
+          name: Main Pool
+          description: Olympic size swimming pool
+          resource_type: pool
+  '400':
+    description: The request body was not valid.
+  '403':
+    description: Missing, invalid, or non-admin API key.
+  '415':
+    description: Wrong media type was used.
+  '409':
+    description: A resource with the same name already exists.

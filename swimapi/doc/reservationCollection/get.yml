@@ -1,0 +1,21 @@
+---
+description: List all reservations.
+security:
+- swimapiApiKey: []
+responses:
+  '200':
+    description: Reservations returned successfully.
+    content:
+      application/json:
+        example:
+        - reservation_id: 1
+          user_id: 2
+          slot_id: 5
+          created_at: '2026-03-30T12:00:00Z'
+        - reservation_id: 2
+          user_id: 3
+          slot_id: 8
+          created_at: '2026-03-30T13:00:00Z'
+  '403':
+    description: Missing, invalid, or non-admin API key.
+

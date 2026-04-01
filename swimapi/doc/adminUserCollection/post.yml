@@ -1,0 +1,42 @@
+---
+description: Create a new admin user. The user_type is always set to "admin" automatically.
+requestBody:
+  required: true
+  description: New admin user data.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/User'
+      example:
+        name: John Doe
+        email: johndoe@example.com
+responses:
+  '201':
+    description: Admin user created successfully.
+    content:
+      application/json:
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          - type: object
+            properties:
+              api_key:
+                type: string
+                minLength: 64
+                maxLength: 64
+            required:
+            - api_key
+        example:
+          user_id: 3
+          name: John Doe
+          email: johndoe@example.com
+          user_type: admin
+          created_at: '2026-03-30T11:05:00Z'
+          api_key: abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd
+  '400':
+    description: The request body was not valid.
+  '409':
+    description: A user with the same email already exists.
+  '415':
+    description: Wrong media type was used.
+

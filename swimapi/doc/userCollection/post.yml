@@ -1,0 +1,42 @@
+---
+description: Create a new user account.
+requestBody:
+  required: true
+  description: New user data.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/User'
+      example:
+        name: Jane Doe
+        email: jane@example.com
+responses:
+  '201':
+    description: User created successfully.
+    content:
+      application/json:
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          - type: object
+            properties:
+              api_key:
+                type: string
+                minLength: 64
+                maxLength: 64
+            required:
+            - api_key
+        example:
+          user_id: 1
+          name: Jane Doe
+          email: jane@example.com
+          user_type: customer
+          created_at: '2026-03-30T10:15:00Z'
+          api_key: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  '400':
+    description: The request body was not valid.
+  '409':
+    description: A user with the same email already exists.
+  '415':
+    description: Wrong media type was used.
+

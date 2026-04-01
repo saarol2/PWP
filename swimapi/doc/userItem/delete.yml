@@ -1,0 +1,14 @@
+---
+description: Delete a user by ID.
+security:
+- swimapiApiKey: []
+parameters:
+- $ref: '#/components/parameters/user_id'
+responses:
+  '204':
+    description: User deleted successfully.
+  '403':
+    description: Missing, invalid, or unauthorized API key.
+  '404':
+    description: The user was not found.
+

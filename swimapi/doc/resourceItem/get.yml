@@ -1,0 +1,19 @@
+---
+description: Get one resource by ID.
+parameters:
+- $ref: '#/components/parameters/resource_id'
+responses:
+  '200':
+    description: Resource returned successfully.
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/Resource'
+        example:
+          resource_id: 1
+          name: Main Pool
+          description: Olympic size swimming pool
+          resource_type: pool
+  '404':
+    description: The resource was not found.
+

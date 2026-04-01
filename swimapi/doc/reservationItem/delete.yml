@@ -1,0 +1,13 @@
+---
+description: Delete a reservation by ID.
+security:
+- swimapiApiKey: []
+parameters:
+- $ref: '#/components/parameters/reservation_id'
+responses:
+  '204':
+    description: Reservation deleted successfully.
+  '403':
+    description: Missing, invalid, or unauthorized API key.
+  '404':
+    description: The reservation was not found.

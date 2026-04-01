@@ -1,0 +1,144 @@
+---
+openapi: 3.0.4
+info:
+  title: SwimAPI
+  version: 0.1.0
+  description: |
+    REST API for managing swimming facility users, resources, timeslots,
+    and reservations.
+servers:
+- url: /api
+components:
+  parameters:
+    user_id:
+      description: Unique identifier of the user
+      in: path
+      name: user_id
+      required: true
+      schema:
+        type: integer
+    resource_id:
+      description: Unique identifier of the resource
+      in: path
+      name: resource_id
+      required: true
+      schema:
+        type: integer
+    slot_id:
+      description: Unique identifier of the timeslot
+      in: path
+      name: slot_id
+      required: true
+      schema:
+        type: integer
+    reservation_id:
+      description: Unique identifier of the reservation
+      in: path
+      name: reservation_id
+      required: true
+      schema:
+        type: integer
+  schemas:
+    User:
+      type: object
+      properties:
+        user_id:
+          description: Auto-generated unique ID
+          type: integer
+          readOnly: true
+        name:
+          description: User's full name
+          type: string
+        email:
+          description: User's unique email address
+          type: string
+          format: email
+        user_type:
+          description: Role of the user
+          type: string
+          enum:
+          - customer
+          - admin
+        created_at:
+          description: Creation timestamp
+          type: string
+          format: date-time
+      required:
+      - name
+      - email
+    Resource:
+      type: object
+      properties:
+        resource_id:
+          description: Auto-generated unique ID
+          type: integer
+          readOnly: true
+        name:
+          description: Name of the resource
+          type: string
+        description:
+          description: Optional description of the resource
+          type: string
+          nullable: true
+        resource_type:
+          description: Type of the resource
+          type: string
+          enum:
+          - pool
+          - sauna
+          - gym
+      required:
+      - name
+      - resource_type
+    Timeslot:
+      type: object
+      properties:
+        slot_id:
+          description: Auto-generated unique ID
+          type: integer
+          readOnly: true
+        resource_id:
+          description: ID of the associated resource
+          type: integer
+        start_time:
+          description: Start time
+          type: string
+          format: date-time
+        end_time:
+          description: End time
+          type: string
+          format: date-time
+        reservation:
+          description: Reservation data if timeslot is reserved, otherwise null
+          allOf:
+          - $ref: '#/components/schemas/Reservation'
+          nullable: true
+      required:
+      - resource_id
+      - start_time
+      - end_time
+    Reservation:
+      type: object
+      properties:
+        reservation_id:
+          description: Auto-generated unique ID
+          type: integer
+          readOnly: true
+        user_id:
+          description: ID of the user making the reservation
+          type: integer
+        slot_id:
+          description: ID of the timeslot to reserve
+          type: integer
+        created_at:
+          description: Creation timestamp
+          type: string
+          format: date-time
+      required:
+      - user_id
+      - slot_id
+  securitySchemes:
+    swimapiApiKey:
+      type: apiKey
+      name: swimapi-api-key
+      in: header

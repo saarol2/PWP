@@ -1,0 +1,14 @@
+---
+description: Delete a resource by ID.
+security:
+- swimapiApiKey: []
+parameters:
+- $ref: '#/components/parameters/resource_id'
+responses:
+  '204':
+    description: Resource deleted successfully.
+  '403':
+    description: Missing, invalid, or non-admin API key.
+  '404':
+    description: The resource was not found.
+

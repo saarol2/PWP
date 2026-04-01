@@ -1,0 +1,31 @@
+---
+description: Replace an existing timeslot's data.
+security:
+- swimapiApiKey: []
+parameters:
+- $ref: '#/components/parameters/slot_id'
+requestBody:
+  required: true
+  description: Full replacement data for the timeslot.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/Timeslot'
+      example:
+        resource_id: 1
+        start_time: '2026-04-01T12:00:00Z'
+        end_time: '2026-04-01T13:00:00Z'
+responses:
+  '204':
+    description: Timeslot updated successfully.
+  '400':
+    description: The request body was not valid.
+  '403':
+    description: Missing, invalid, or non-admin API key.
+  '404':
+    description: The timeslot was not found.
+  '409':
+    description: The timeslot conflicts with existing data.
+  '415':
+    description: Wrong media type was used.
+

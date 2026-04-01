@@ -1,0 +1,20 @@
+---
+description: List all users.
+responses:
+  '200':
+    description: Users returned successfully.
+    content:
+      application/json:
+        example:
+        - user_id: 1
+          name: Jane Doe
+          email: jane@example.com
+          user_type: customer
+          created_at: '2026-03-30T10:15:00Z'
+        - user_id: 2
+          name: Admin User
+          email: admin@example.com
+          user_type: admin
+          created_at: '2026-03-30T10:17:00Z'
+  '403':
+    description: Missing, invalid, or non-admin API key.

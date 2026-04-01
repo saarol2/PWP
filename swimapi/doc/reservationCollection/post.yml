@@ -1,0 +1,40 @@
+---
+description: Create a new reservation for the authenticated user.
+security:
+- swimapiApiKey: []
+requestBody:
+  required: true
+  description: Reservation request.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          slot_id:
+            description: ID of the timeslot to reserve
+            type: integer
+        required:
+        - slot_id
+      example:
+        slot_id: 5
+responses:
+  '201':
+    description: Reservation created successfully.
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/Reservation'
+        example:
+          reservation_id: 1
+          user_id: 2
+          slot_id: 5
+          created_at: '2026-03-30T12:00:00Z'
+  '400':
+    description: The request body was not valid.
+  '403':
+    description: Missing or invalid API key.
+  '409':
+    description: The timeslot is already reserved.
+  '415':
+    description: Wrong media type was used.
+

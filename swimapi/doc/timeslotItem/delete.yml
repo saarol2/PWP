@@ -1,0 +1,14 @@
+---
+description: Delete a timeslot by ID.
+security:
+- swimapiApiKey: []
+parameters:
+- $ref: '#/components/parameters/slot_id'
+responses:
+  '204':
+    description: Timeslot deleted successfully.
+  '403':
+    description: Missing, invalid, or non-admin API key.
+  '404':
+    description: The timeslot was not found.
+

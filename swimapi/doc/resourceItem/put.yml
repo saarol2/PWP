@@ -1,0 +1,31 @@
+---
+description: Replace an existing resource's data.
+security:
+- swimapiApiKey: []
+parameters:
+- $ref: '#/components/parameters/resource_id'
+requestBody:
+  required: true
+  description: Full replacement data for the resource.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/Resource'
+      example:
+        name: Main Pool
+        description: Renovated Olympic pool
+        resource_type: pool
+responses:
+  '204':
+    description: Resource updated successfully.
+  '400':
+    description: The request body was not valid.
+  '403':
+    description: Missing, invalid, or non-admin API key.
+  '404':
+    description: The resource was not found.
+  '409':
+    description: A resource with these details already exists.
+  '415':
+    description: Wrong media type was used.
+
