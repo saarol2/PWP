@@ -7,7 +7,7 @@ info:
     REST API for managing swimming facility users, resources, timeslots,
     and reservations.
 servers:
-- url: /api
+  - url: /
 components:
   parameters:
     user_id:
