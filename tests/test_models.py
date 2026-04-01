@@ -110,8 +110,8 @@ class TestTimeslot:
         serialized = timeslot.serialize()
         assert serialized["slot_id"] == 1
         assert serialized["resource_id"] == 2
-        assert serialized["start_time"] == "2024-01-01T08:00:00"
-        assert serialized["end_time"] == "2024-01-01T09:30:00"
+        assert serialized["start_time"] == "2024-01-01T08:00:00Z"
+        assert serialized["end_time"] == "2024-01-01T09:30:00Z"
 
     def test_deserialize(self):
         """deserialize() should parse ISO strings into datetime objects."""

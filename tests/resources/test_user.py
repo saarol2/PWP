@@ -13,8 +13,8 @@ class TestUserCollection:
     RESOURCE_URL = "/api/users"
 
     def test_get(self, client):
-        """GET should return 200 and a list of users."""
-        resp = client.get(self.RESOURCE_URL)
+        """GET should return 200 and a list of users (admin only)."""
+        resp = client.get(self.RESOURCE_URL, headers={"swimapi-api-key": "admin-api-key"})
         assert resp.status_code == 200
         data = json.loads(resp.data)
         assert isinstance(data, list)
