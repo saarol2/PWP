@@ -25,7 +25,6 @@ All dependencies are declared in [pyproject.toml](pyproject.toml).
 
 
 
-
 # 2.  Installation
 
 ### 2.1 Clone the repository 
@@ -84,7 +83,7 @@ pip install -e ".[dev]"
 
 ```
 
-## 3. Running the API 
+# 3. Running the API 
 
  
 
@@ -191,7 +190,7 @@ Reservation.query.all()  # [<Reservation User 1 Slot 1>]
 ```
 
 
-## 5. Running Tests 
+# 5. Running Tests 
 
  
 
@@ -229,7 +228,12 @@ pytest tests/resources/ -v
 
 ``` 
 
- 
+# 6. Cloud Deployment
+
+API is deployed on Fly.io (https://fly.io/) service with using Docker.  
+API is running in https://pwp.fly.dev/api
+
+
 
 __Remember to include all required documentation and HOWTOs, including how to create and populate the database, how to run and test the API, the url to the entrypoint, instructions on how to setup and run the client, instructions on how to setup and run the axiliary service and instructions on how to deploy the api in a production environment__
 
