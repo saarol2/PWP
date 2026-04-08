@@ -21,7 +21,7 @@ def set_sqlite_pragma(dbapi_connection, _connection_record):
 def create_app():
     """Create and configure the Flask application."""
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////data/example.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SWAGGER"] = {
     "title": "SwimAPI",
