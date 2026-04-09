@@ -1,4 +1,6 @@
 """Flask application factory for the swimapi package."""
+import os
+from pathlib import Path
 
 from flask import Flask
 from sqlalchemy import event
@@ -21,7 +23,18 @@ def set_sqlite_pragma(dbapi_connection, _connection_record):
 def create_app():
     """Create and configure the Flask application."""
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////data/example.db"
+
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    else:
+        if Path("/data").exists():
+            db_file = Path("/data/example.db")
+        else:
+            Path(app.instance_path).mkdir(parents=True, exist_ok=True)
+            db_file = Path(app.instance_path) / "example.db"
+        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_file.as_posix()}"
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SWAGGER"] = {
     "title": "SwimAPI",
