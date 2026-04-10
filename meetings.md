@@ -41,7 +41,7 @@ On README-file, next time use project layout document as a model.
 ### Action points
 - API is not statelessness as it shows different things when logged in as different person.
 - Connectness, check the example (II) in lecture notes
-- 
+- Division for coding is not even, Oliver and Janne has done all the coding parts.
 - Justify caches better.
 
 
