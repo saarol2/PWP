@@ -66,7 +66,7 @@ On README-file, next time use project layout document as a model.
 - examples of fly.io's health/server/logs or so add to the information text
 
 ### Notes
-Plans for the server employment: not made yet, but 
+Plans for the server deployment: not made yet, but 
 
 Be sure that all contribute and understand the work.
 
