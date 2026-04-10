@@ -49,10 +49,13 @@ On README-file, next time use project layout document as a model.
 *Add here notes that you consider important. This is not mandatory*
 
 
+
+
+
 ## Meeting 4.
-* **DATE:**
-* **PARTICIPANTS:**
-* **TEACHER:**
+* **DATE: 10.4.**
+* **PARTICIPANTS: Oliver Saari, Janne Tuikka, Minna Väänänen**
+* **TEACHER: Iván Sánchez**
 
 ### Action points
 *List here the actions points discussed with assistants*
