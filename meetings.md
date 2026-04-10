@@ -58,11 +58,17 @@ On README-file, next time use project layout document as a model.
 * **TEACHER: Iván Sánchez**
 
 ### Action points
-*List here the actions points discussed with assistants*
+- include 401 - unauthorized access
+- 403 - invalid access
+- recommending return created object
+- Gunicorn 
+- Can't have multiple access from docker
+- examples of fly.io's health/server/logs or so add to the information text
 
 ### Notes
-*Add here notes that you consider important. This is not mandatory*
+Plans for the server employment: not made yet, but 
 
+Be sure that all contribute and understand the work.
 
 ## Midterm meeting
 * **DATE:**
