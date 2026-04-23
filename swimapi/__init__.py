@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 from flask import Flask
+from flask_cors import CORS
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from flasgger import Swagger
@@ -42,6 +43,14 @@ def create_app():
     "uiversion": 3,
     "doc_dir": "./doc"
     }
+
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": ["http://127.0.0.1:5500", "http://localhost:5500"]}},
+        allow_headers=["Content-Type", "swimapi-api-key"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    )
+
     swagger = Swagger(app, template_file="doc/base.yml")
 
     db.init_app(app)
