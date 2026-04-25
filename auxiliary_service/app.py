@@ -2,8 +2,8 @@
 
 import os
 from flask import Flask
-from routes import auxiliary_bp
 from dotenv import load_dotenv
+from routes import auxiliary_bp
 
 load_dotenv()
 

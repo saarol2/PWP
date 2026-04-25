@@ -1,0 +1,22 @@
+name: Fly Deploy Auxiliary
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - auxiliary_service/**
+      - fly.aux.toml
+      - .github/workflows/fly-deploy-auxiliary.yml
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy auxiliary app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy -c fly.aux.toml --dockerfile auxiliary_service/Dockerfile --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

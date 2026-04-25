@@ -1,0 +1,34 @@
+name: Auxiliary Daily Run
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  run-cycle:
+    name: Trigger auxiliary run-cycle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /run-cycle
+        env:
+          AUXILIARY_BASE_URL: ${{ secrets.AUXILIARY_BASE_URL }}
+          AUXILIARY_RUN_TOKEN: ${{ secrets.AUXILIARY_RUN_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${AUXILIARY_BASE_URL:-}" ]; then
+            echo "AUXILIARY_BASE_URL secret is required (for example https://pwp-auxiliary.fly.dev)."
+            exit 1
+          fi
+
+          AUTH_HEADER=()
+          if [ -n "${AUXILIARY_RUN_TOKEN:-}" ]; then
+            AUTH_HEADER=(-H "x-aux-run-token: ${AUXILIARY_RUN_TOKEN}")
+          fi
+
+          curl --fail --silent --show-error \
+            -X POST "${AUXILIARY_BASE_URL}/run-cycle" \
+            -H "Content-Type: application/json" \
+            "${AUTH_HEADER[@]}" \
+            -d '{"days_ahead":7}'
