@@ -1,13 +1,20 @@
+"""Application entrypoint for the auxiliary maintenance service."""
+
+import os
 from flask import Flask
 from routes import auxiliary_bp
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def create_app():
-    app = Flask(__name__)
-    app.register_blueprint(auxiliary_bp)
-    return app
+    """Create and configure the Flask application instance."""
+    application = Flask(__name__)
+    application.register_blueprint(auxiliary_bp)
+    return application
 
 
 if __name__ == "__main__":
-    app = create_app()
-    app.run(port=5001, debug=True)
+    app_instance = create_app()
+    debug_mode = os.getenv("AUX_DEBUG", "0") == "1"
+    app_instance.run(port=5001, debug=debug_mode)
