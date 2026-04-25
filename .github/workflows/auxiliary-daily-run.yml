@@ -4,31 +4,44 @@ on:
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
+    inputs:
+      days_ahead:
+        description: "Days to generate forward"
+        required: false
+        default: "7"
 
 jobs:
   run-cycle:
-    name: Trigger auxiliary run-cycle
+    name: Run auxiliary maintenance cycle
     runs-on: ubuntu-latest
     steps:
-      - name: Call /run-cycle
-        env:
-          AUXILIARY_BASE_URL: ${{ secrets.AUXILIARY_BASE_URL }}
-          AUXILIARY_RUN_TOKEN: ${{ secrets.AUXILIARY_RUN_TOKEN }}
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
         run: |
-          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv
 
-          if [ -z "${AUXILIARY_BASE_URL:-}" ]; then
-            echo "AUXILIARY_BASE_URL secret is required (for example https://pwp-auxiliary.fly.dev)."
-            exit 1
-          fi
+      - name: Execute maintenance cycle
+        env:
+          MAIN_API_URL: ${{ secrets.MAIN_API_URL }}
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+          API_KEY_HEADER: ${{ secrets.API_KEY_HEADER }}
+          CLEANUP_AGE_DAYS: ${{ secrets.CLEANUP_AGE_DAYS }}
+          REQUEST_TIMEOUT: ${{ secrets.REQUEST_TIMEOUT }}
+          DEFAULT_DAYS_AHEAD: ${{ github.event.inputs.days_ahead || '7' }}
+        run: |
+          cd auxiliary_service
+          python - <<'PY'
+          import os
+          from maintenance_service import run_full_cycle
 
-          AUTH_HEADER=()
-          if [ -n "${AUXILIARY_RUN_TOKEN:-}" ]; then
-            AUTH_HEADER=(-H "x-aux-run-token: ${AUXILIARY_RUN_TOKEN}")
-          fi
-
-          curl --fail --silent --show-error \
-            -X POST "${AUXILIARY_BASE_URL}/run-cycle" \
-            -H "Content-Type: application/json" \
-            "${AUTH_HEADER[@]}" \
-            -d '{"days_ahead":7}'
+          days_ahead = int(os.getenv("DEFAULT_DAYS_AHEAD", "7"))
+          result = run_full_cycle(days_ahead)
+          print(result)
+          PY
