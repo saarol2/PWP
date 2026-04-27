@@ -235,6 +235,59 @@ API is running in https://pwp.fly.dev/api
 
 Specification available https://pwp.fly.dev/apidocs/#/
 
-__Remember to include all required documentation and HOWTOs, including how to create and populate the database, how to run and test the API, the url to the entrypoint, instructions on how to setup and run the client, instructions on how to setup and run the axiliary service and instructions on how to deploy the api in a production environment__
+# 7. Auxiliary Service
 
+The auxiliary service performs maintanance against the Swim API. It deletes old timeslots and generates future timeslots automatically once a day. Manual runs can be completed on project's GitHub Actions page or locally, which is instructed below.
 
+## Prerequisites
+
+- Python 3.10+
+- Main API URL
+- Admin API key
+
+## Install
+
+- Create and activate a virtual environment
+- Install dependencies
+
+Windows:
+
+```bash 
+
+python -m venv .venv
+.venv\Scripts\activate
+pip install --upgrade pip
+pip install flask requests python-dotenv gunicorn
+
+``` 
+
+Linux/macOS:
+
+```bash 
+
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install flask requests python-dotenv gunicorn
+
+``` 
+
+## Connect to main API
+
+Configure these variables (add to .env for local runs):
+
+- MAIN_API_URL: https://pwp.fly.dev/api
+- ADMIN_API_KEY: Admin key to allow create/delete
+- API_KEY_HEADER: Default is swimapi-api-key
+
+## Run Locally as HTTP service
+
+- Start Flask app from auxiliary_service folder
+- Server runs on http://127.0.0.1:5001
+
+## Endpoints
+
+| GET /health | Health check |
+| POST /cleanup | Deletes old timeslots |
+| POST /generate | Generates future timeslots |
+| POST /run-cycle | Runs generate and cleanup |
