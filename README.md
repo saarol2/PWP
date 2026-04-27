@@ -288,6 +288,10 @@ Configure these variables (add to .env for local runs):
 ## Endpoints
 
 | GET /health | Health check |
+
 | POST /cleanup | Deletes old timeslots |
+
 | POST /generate | Generates future timeslots |
+
 | POST /run-cycle | Runs generate and cleanup |
+
